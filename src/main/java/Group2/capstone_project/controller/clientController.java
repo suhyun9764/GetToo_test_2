@@ -33,11 +33,6 @@ public class clientController {
         this.passwordEncoder =passwordEncoder;
     }
 
-    //@GetMapping("/")
-    public String home(){
-        return "/index.html";
-    }
-
     @GetMapping("/")
     public String Home(HttpServletRequest request, Model model){
         HttpSession session = request.getSession(false);
@@ -51,7 +46,7 @@ public class clientController {
 
         System.out.println("모델:"+client.getName());
         model.addAttribute("name", client.getName());
-        return "login_index.html";
+        return "loginClient/login_index.html";
     }
 
     @GetMapping("/gotoJoin")
@@ -65,7 +60,7 @@ public class clientController {
         if(session != null){
             Client client = (Client) session.getAttribute(SessionConst.LOGIN_CLIENT);
             if(client != null){
-                return "login_index.html";
+                return "loginClient/login_index.html";
             }
         }
         return "login.html";
@@ -80,44 +75,11 @@ public class clientController {
         return "/client/clienthome";
     }
 
-   // @PostMapping("/client/login")
-    public String login(@ModelAttribute ClientDto clientDto, HttpSession Session, HttpServletResponse response){
-        Client client = new Client();
-        client.setId(clientDto.getId());
-        client.setPwd(clientDto.getPassword());
-           Optional<Client> result = clientserivce.login(client);
-        if(result!=null) {
-            Cookie idCookie = new Cookie("clientId", client.getId());
-            response.addCookie(idCookie);
-            Session.setAttribute("loginId",result.get().getId());
-            return "redirect:/";
-        }else{
-            return "redirect:/login.html";
-            
-        }
-    }
 
-    // @PostMapping("/clientlogin")
-    public String loginV2(@ModelAttribute ClientDto clientDto, HttpServletRequest request, HttpServletResponse response){
-        Client client = (Client)sessionManager.getSession(request);
-        if(client !=null)
-            return "redirect:/";
-        Client client2 = new Client();
-        client2.setId(clientDto.getId());
-        client2.setPwd(clientDto.getPassword());
-        Optional<Client> result = clientserivce.login(client2);
-        if(result!=null) {
-            sessionManager.createSession(client2, response);
-            return "redirect:/";
-        }else{
-            return "redirect:/login.html";
-
-        }
-    }
 
     @PostMapping("/clientlogin")
     public String loginV3(@ModelAttribute ClientDto clientDto,@RequestParam(defaultValue = "/")String redirectURL,
-                          HttpServletRequest request){
+                          HttpServletRequest request,Model model){
 
         Client client = new Client();
         client.setId(clientDto.getId());
@@ -128,7 +90,8 @@ public class clientController {
             session.setAttribute(SessionConst.LOGIN_CLIENT, result.get() );
             return "redirect:"+redirectURL;
         }else{
-            return "redirect:/login.html?error=true";
+            model.addAttribute("errorMessage", "일치하는 계정정보가 없습니다");
+            return "login.html";
 
         }
     }
@@ -142,10 +105,10 @@ public class clientController {
         return  "/client/findAccount";
     }
 
-    @GetMapping("/login_client/gotoMoim_index")
-    public String gotoMoimIndex(){
-        return  "loginClient/moim_index.html";
-    }
+   // @GetMapping("/login_client/writeBoard")
+   // public String gotoMoimIndex(){
+     //   return  "loginClient/createclubBoard.html";
+    //}
 
     @PostMapping("/client/join")
     public String create(ClientDto ClientDto){
@@ -171,15 +134,21 @@ public class clientController {
         return "client/clientlist";
     }
 
-    @GetMapping("client/findID")
+    @PostMapping("/client/findID")
     public String findID(Model model, @ModelAttribute ClientDto ClientDto){
+        System.out.println("come");
         Client client = new Client();
         client.setName(ClientDto.getName());
         client.setStudentNumber(ClientDto.getStudentNumber());
-        client.setAge(ClientDto.getAge());
-        String result = clientserivce.findId(client.getName(), ClientDto.getStudentNumber(), client.getAge());
+        client.setEmail(ClientDto.getEmail());
+        String result = clientserivce.findId(client.getName(), client.getStudentNumber(), client.getEmail());
+        if(result=="false"){
+            model.addAttribute("errorMessage", "일치하는 계정정보가 없습니다");
+            return "idSearch.html";
+        }
         model.addAttribute("result",result);
-        return "client/checkyourId";
+        System.out.println("result :"+result);
+        return "loginclient/checkyourId";
     }
 
     @GetMapping("client/findPwd")
@@ -188,7 +157,8 @@ public class clientController {
         client.setName(ClientDto.getName());
         client.setId(ClientDto.getId());
         client.setStudentNumber(ClientDto.getStudentNumber());
-        String result = clientserivce.findPwd(client.getName(), client.getId(), ClientDto.getStudentNumber());
+        client.setEmail(client.getEmail());
+        String result = clientserivce.findPwd(client.getName(), client.getId(), client.getStudentNumber(),client.getEmail());
         model.addAttribute("result",result);
         return "client/checkyourPwd";
     }
@@ -212,28 +182,7 @@ public class clientController {
         return "/client/updateresult";
     }
 
-    //@GetMapping("/client/logout")
 
-    public String logOut(HttpSession httpSession, HttpServletResponse response){
-        Cookie cookie = new Cookie("clientId", null);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-        httpSession.invalidate();
-        return "redirect:/";
-    }
-
-   // @PostMapping ("/clientlogout")
-    public String logOut(HttpServletRequest request, HttpServletResponse response){
-        sessionManager.expire(request);
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                cookie.setMaxAge(0);
-                response.addCookie(cookie);
-            }
-        }
-        return "redirect:/login.html";
-    }
 
      @PostMapping ("/clientlogout")
     public String logOut(HttpServletRequest request){
@@ -241,7 +190,7 @@ public class clientController {
         if(session!=null) {
             session.invalidate();
         }
-        return "redirect:/login.html";
+        return "login.html";
     }
 
 
@@ -252,27 +201,27 @@ public class clientController {
         return "/board/home";
     }
 
-    @GetMapping("/loginClient/moim_index.html")
+    @GetMapping("loginClient/writeBoard")
     public String onlyLeader(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute(SessionConst.LOGIN_CLIENT) == null) {
             model.addAttribute("errorMessage", "권한이 없습니다");
-            return "login_index.html";
+            return "loginClient/login_index.html";
         }
 
         Client client = (Client) session.getAttribute(SessionConst.LOGIN_CLIENT);
         if (client == null || client.getId() == null) {
             model.addAttribute("errorMessage", "권한이 없습니다");
-            return "login_index.html";
+            return "loginClient/login_index.html";
         }
 
         Client chkClient = clientserivce.findById(client.getId());
-        if (chkClient == null || !"ing".equals(chkClient.getSchool())) {
+        if (chkClient == null || !"YES".equals(chkClient.getLeader())) {
             model.addAttribute("errorMessage", "권한이 없습니다");
-            return "login_index.html";
+            return "loginClient/login_index.html";
         }
 
-        return "/loginClient/contact.html";
+        return "loginClient/createclubBoard.html";
     }
 
     @PostMapping("/client/check-id")
@@ -284,6 +233,16 @@ public class clientController {
         } else {
             return ResponseEntity.ok("not-available");
         }
+    }
+
+    @GetMapping("/gotoIdSearch")
+    public String gotoIdSearch(){
+        return "idSearch.html";
+    }
+
+    @GetMapping("/gotoPwdSearch")
+    public String gotoPwdSearch(){
+        return "passwordsearch.html";
     }
 
 

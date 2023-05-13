@@ -8,6 +8,16 @@ public class  Client {
     private String pwd;
     private String department;
 
+    private String Leader;
+
+    public String getLeader() {
+        return Leader;
+    }
+
+    public void setLeader(String leader) {
+        Leader = leader;
+    }
+
     public String getDepartment() {
         return department;
     }

@@ -23,20 +23,32 @@ public class MysqlClientRepository implements ClientRepository{
     }
 
     @Override
-    public Optional<Client> findId(String name, String studentNumber, String age) {
-        String[] object = {name,studentNumber,age};
-        String sql = "SELECT * FROM client where name = ? and studentNumber = ? and age = ?";
+    public Optional<Client> findId(String name, String studentNumber, String email) {
+        System.out.println(name+studentNumber+email);
+        String[] object = {name,studentNumber,email};
+        String sql = "SELECT * FROM client where name = ? and studentNumber = ? and email = ?";
+
         List<Client> result = jdbcTemplate.query(sql,clientRowMapper(),object);
+        if(result.isEmpty()){
+            System.out.println("repoEmpty");
+            return Optional.empty();
+        }
         return result.stream().findAny();
 
     }
 
     @Override
-    public Optional<Client> findPwd(String name, String id, String studentNumber) {
-        String[] object = {name,id,studentNumber};
-        String sql = "SELECT * FROM client where name = ? and id = ? and studentNumber = ?";
+    public Optional<Client> findPwd(String name, String id, String studentNumber, String email) {
+        String[] object = {name,id,studentNumber,email};
+        String sql = "SELECT * FROM client where name = ? and id = ? and studentNumber = ? and email =?";
         List<Client> result = jdbcTemplate.query(sql,clientRowMapper(),object);
-        return result.stream().findAny();
+        if(result.isEmpty()){
+            System.out.println("repoEmpty");
+            return Optional.empty();
+        }else {
+            System.out.println("repoNotEmpty");
+            return result.stream().findAny();
+        }
     }
     @Override
     public List<Client> findAll() {
@@ -64,6 +76,7 @@ public class MysqlClientRepository implements ClientRepository{
             client.setEmail(rs.getString("email"));
             client.setSchool(rs.getString("school"));
             client.setDepartment(rs.getString("department"));
+            client.setLeader(rs.getString("Leader"));
 
             return client;
         };

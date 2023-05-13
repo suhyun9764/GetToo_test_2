@@ -31,13 +31,16 @@ public class clientService {
                 });
     }
 
-    public String findId(String clientName, String clientStudentNumber, String clientAge) {
-        Optional<Client> client = clientRepository.findId(clientName, clientStudentNumber, clientAge);
-        return client.get().getId();
+    public String findId(String clientName, String clientStudentNumber, String clientEmail) {
+        Optional<Client> client = clientRepository.findId(clientName, clientStudentNumber,clientEmail);
+        if(client.isPresent())
+            return client.get().getId();
+        else
+            return "false";
     }
 
-    public String findPwd(String clientName, String clientId, String clientStudentNumber) {
-        Optional<Client> client = clientRepository.findPwd(clientName, clientId, clientStudentNumber);
+    public String findPwd(String clientName, String clientId, String clientStudentNumber, String clientEmail) {
+        Optional<Client> client = clientRepository.findPwd(clientName, clientId, clientStudentNumber, clientEmail);
         return client.get().getPwd();
     }
 

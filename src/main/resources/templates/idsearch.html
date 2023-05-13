@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name = "viewport" content="width=device-width, initial-scale=1">
+<link rel = "stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/idsearch.css">
+<title>아이디 찾기</title>
+
+</head>
+<body>
+    <section class="idsearch_form">
+	<div class="idsearch">
+		<div class="idsearch">
+			<form action="/client/findID" method="post">
+				<div class="idsearch">
+					<h1>아이디 찾기</h1>
+				</div>
+				<div>
+					<p>
+                        <label for = "name">이름</label>
+                        <input class="name" type="name" id ="name" size="15" placeholder="이름" onfocus="this.placeholder=''" onblur="this.placeholder='이름'" name="name"><br>
+                        <label for="studentNumber">학번</label>
+                        <input class="ClassNum" type="ClassNum" id ="studentNumber" size="15" placeholder="학번" onfocus="this.placeholder=''" onblur="this.placeholder='학번'" name="studentNumber" maxlength="8"><br>
+                        <label for="email">이메일</label>
+                        <input class="e-mail" type="email" id ="email"size="15" placeholder="이메일" onfocus="this.placeholder=''" onblur="this.placeholder='이메일'" name="email"><br>
+					</p>
+					<div class="IDbox">
+						<div th:if="${errorMessage}">
+							<script th:inline="javascript">
+								alert([[${errorMessage}]]);
+							</script>
+						</div>
+						<button type = "submit" id = findBtn>find</button>
+
+						<button type = "button" id = findBtn1 onclick="history.go(-1);">Cancel</button>
+					</p>
+				</div>
+			</form>
+		</div>
+	</div>
+</section>
+    
+</body>
+
+<script>
+/*window.open("window.html", "win", "width=800, height=500");*/
+
+$(window).load(function() {
+var strWidth;
+var strHeight;
+//innerWidth / innerHeight / outerWidth / outerHeight 지원 브라우저 
+
+if ( window.innerWidth && window.innerHeight && window.outerWidth && window.outerHeight ) {
+
+  strWidth = $('#idsearch').outerWidth() + (window.outerWidth - window.innerWidth);
+
+  strHeight = $('#idsearch').outerHeight() + (window.outerHeight - window.innerHeight);
+
+}
+
+else {
+
+  var strDocumentWidth = $(document).outerWidth();
+
+  var strDocumentHeight = $(document).outerHeight();
+
+
+
+  window.resizeTo ( strDocumentWidth, strDocumentHeight );
+
+
+
+  var strMenuWidth = strDocumentWidth - $(window).width();
+
+  var strMenuHeight = strDocumentHeight - $(window).height();
+
+
+
+  strWidth = $('#idsearch').outerWidth() + strMenuWidth;
+
+  strHeight = $('#idsearch').outerHeight() + strMenuHeight;
+
+}
+
+
+
+//resize 
+
+window.resizeTo( strWidth, strHeight );
+
+});
+
+
+</script>
+
+
+</html>

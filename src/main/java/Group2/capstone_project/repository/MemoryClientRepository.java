@@ -41,7 +41,7 @@ public class MemoryClientRepository implements ClientRepository{
 
 
     @Override
-    public Optional<Client> findPwd(String name, String id, String studentNumber) {
+    public Optional<Client> findPwd(String name, String id, String studentNumber, String email) {
         return clients.stream().filter(client -> client.getName().equals(name)
                  &&client.getId().equals(id)
                 &&client.getStudentNumber().equals(studentNumber)).findAny();

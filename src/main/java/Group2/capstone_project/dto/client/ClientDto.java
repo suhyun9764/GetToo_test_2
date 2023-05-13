@@ -20,6 +20,16 @@ public class ClientDto {
     private String email;
     private String department;
 
+    public String getLeader() {
+        return Leader;
+    }
+
+    public void setLeader(String leader) {
+        Leader = leader;
+    }
+
+    private String Leader;
+
     public String getDepartment() {
         return department;
     }
